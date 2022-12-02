@@ -4,7 +4,10 @@ import os
 
 
 class AdventOfCode2022Day(abc.ABC):
-    """The abstract parent class for any Advent of Code days."""
+    """The abstract parent class for any Advent of Code days.
+
+    Set up in such a way that any child classes can access "self.input" to get the input for that day.
+    """
 
     def __init_subclass__(cls, day: int = None, **kwargs):
         """Takes a subclass argument indicating what day the code is for.
