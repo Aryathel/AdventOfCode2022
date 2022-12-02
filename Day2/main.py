@@ -1,4 +1,5 @@
 from enum import Enum
+from utils import AdventOfCode2022Day
 
 
 class Move(Enum):
@@ -12,7 +13,10 @@ class Move(Enum):
     Scissors = 3, "C", "Z"
 
     def __new__(cls, *values):
-        """Updates the __new__ class creator to allow multiple values for an enum field."""
+        """Updates the __new__ class creator to allow multiple values for an enum field.
+
+        "*values" turns something like the 1, "A", "X" into a list of values [1, "A", "X"] and passes it as an argument.
+        """
         obj = object.__new__(cls)
 
         # Set the primary value to the first value.
@@ -71,68 +75,64 @@ class Move(Enum):
         raise ValueError(f'Recommended move type not handled: {recommended}.')
 
 
-def get_input() -> str:
-    """Read data input from file."""
-    with open('./input.txt', 'r') as f:
-        return f.read()
+class Day2(AdventOfCode2022Day, day=2):
+    @staticmethod
+    def get_points_for_round(opponent_move: Move, player_move: Move) -> int:
+        """Get points from Move enum value.
 
+        Draw = 3 pts
+        Win  = 6 pts
+        Loss = 0 pts
+        """
+        points: int = player_move.value
 
-def get_points_for_round(opponent_move: Move, player_move: Move) -> int:
-    """Get points from Move enum value.
+        # Draw
+        if player_move == opponent_move:
+            points += 3
 
-    Draw = 3 pts
-    Win  = 6 pts
-    Loss = 0 pts
-    """
-    points: int = player_move.value
+        # Win
+        if player_move > opponent_move:
+            points += 6
 
-    # Draw
-    if player_move == opponent_move:
-        points += 3
+        return points
 
-    # Win
-    if player_move > opponent_move:
-        points += 6
+    def step_1(self) -> int:
+        """Read the first value in the round as the opponent move, and the second value as the player move."""
 
-    return points
+        points = 0
+        for round in self.input.split('\n'):
+            opponent_move, player_move = round.split(' ')
 
+            # Read the moves as enums
+            opponent_move = Move(opponent_move)
+            player_move = Move(player_move)
 
-def step_1(data: str) -> int:
-    """Read the first value in the round as the opponent move, and the second value as the player move."""
+            # Get the number of points for the round
+            points += self.get_points_for_round(opponent_move, player_move)
+        return points
 
-    points = 0
-    for round in data.split('\n'):
-        opponent_move, player_move = round.split(' ')
+    def step_2(self) -> int:
+        """Read the first value in a round as the opponent move,
+        and the second value as the response the player should take.
 
-        # Read the moves as enums
-        opponent_move = Move(opponent_move)
-        player_move = Move(player_move)
+        X = Lose
+        Y = Draw
+        Z = Win
+        """
 
-        # Get the number of points for the round
-        points += get_points_for_round(opponent_move, player_move)
-    return points
+        points = 0
+        for round in self.input.split('\n'):
+            opponent_move, player_move = round.split(' ')
+            opponent_move = Move(opponent_move)
+            player_move = opponent_move.get_recommended_move(player_move)
+            points += self.get_points_for_round(opponent_move, player_move)
+        return points
 
-
-def step_2(data: str) -> int:
-    """Read the first value in a round as the opponent move,
-    and the second value as the response the player should take.
-
-    X = Lose
-    Y = Draw
-    Z = Win
-    """
-
-    points = 0
-    for round in data.split('\n'):
-        opponent_move, player_move = round.split(' ')
-        opponent_move = Move(opponent_move)
-        player_move = opponent_move.get_recommended_move(player_move)
-        points += get_points_for_round(opponent_move, player_move)
-    return points
+    def run(self) -> None:
+        self.header()
+        print(f'Step 1: {self.step_1()}')
+        print(f'Step 2: {self.step_2()}')
 
 
 if __name__ == "__main__":
-    print('Advent of Code 2022 Day 2', '-------------------------', sep='\n')
-    data = get_input()
-    print(f'Step 1: {step_1(data)}')
-    print(f'Step 2: {step_2(data)}')
+    Day2().run()
