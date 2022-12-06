@@ -2,11 +2,20 @@ from utils import AdventOfCode2022Day
 
 
 class Day6(AdventOfCode2022Day, day=6):
-    def step_1(self) -> None:
-        pass
+    def step_1(self) -> int:
+        buff = self.input.strip()
 
-    def step_2(self) -> None:
-        pass
+        # Iterate o
+        for i in range(4, len(buff)):
+            if len(set(buff[i-4:i])) == 4:
+                return i
+
+    def step_2(self) -> int:
+        buff = self.input.strip()
+
+        for i in range(14, len(buff)):
+            if len(set(buff[i-14:i])) == 14:
+                return i
 
     def run(self) -> None:
         self.header()
